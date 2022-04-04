@@ -135,24 +135,32 @@ class Router
                 if ($routeData["callback"]) {
 
                     // Execute a regular callback
-                    if (!$routeData["controller"]) {
-                        $routeData["callback"]();
+                    if (!isset($routeData["controller"])) {
+                        $returnData = $routeData["callback"]();
+                        header("api-response: $returnData");
+                        echo $returnData;
                         return;
                     }
                     
 
                     $controller = $routeData["controller"];
                     $method = $routeData["callback"];
-                    error_log('METHOD: ' . $method);
+                    error_log('Controller method: ' . $method);
                     
                     // Execute a controller method
                     if ($routeData["args"]) {
                         // Call with arguments
-                        call_user_func(array($controller, $method), ...$routeData["args"]);
+                        $returnData = call_user_func(array($controller, $method), ...$routeData["args"]);
                     } else {
                         // Call without arguments.
-                        call_user_func(array($controller, $method));
+                        $returnData = call_user_func(array($controller, $method));
                     }
+
+                    if ($returnData) {
+                        header("api-response: $returnData");
+                        echo $returnData;
+                    }
+                    
                     
 
                 }
