@@ -1,2 +1,3 @@
 *.sql
 views/*.php
+public/*.php

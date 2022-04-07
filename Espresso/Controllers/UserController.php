@@ -16,12 +16,12 @@ class UserController
         User::login($_POST["email"], $_POST["password"]);
 
         if (User::$error) {
-            error_log(User::$error);
+            // error_log(User::$error);
             header("Location: /login?message=" . User::$error);
             return;
         }
 
-        header("Location: /");
+        header("Location: /?message=logged_in");
     }
 
     public function logout()

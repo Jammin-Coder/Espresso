@@ -23,7 +23,7 @@ class Router
         $controller = $callback[0]; // Get the name of the controller
         $controllerMethod = $callback[1]; // Get the method of the controller the programmer wants to call
         
-        self::$routes["$resource"] = [
+        self::$routes[$resource] = [
             "callback" => $controllerMethod,
             "controller" => $controller,
             "method" => $requestMethod
@@ -33,7 +33,7 @@ class Router
         // arguments to be passed into the method.
         // Extract the arguments and add them to self::$routes[$resource]["args"].
         if (count($callback) > 2) {
-            self::$routes["$resource"]["args"] = array_slice($callback, 2);
+            self::$routes[$resource]["args"] = array_slice($callback, 2);
         }
     }
 
@@ -104,8 +104,6 @@ class Router
 
         // Verify anti-CSRF token.
         if(!XCSRF::tokenIsOK($_POST[XCSRF::XCSRF_TOKEN])) {
-            
-            XCSRF::setNewCSRFToken();
             self::$routes[$resource] = [
                 "callback" => function () {
                     echo "Token expired";
@@ -132,15 +130,25 @@ class Router
             
             // If the route matches, execute the callback.
             if ($route == $_SERVER['PATH_INFO']) {
-                if ($routeData["callback"]) {
-
+                if (isset($routeData["callback"])) {
+                    
                     // Execute a regular callback
                     if (!isset($routeData["controller"])) {
-                        $returnData = $routeData["callback"]();
-                        header("api-response: $returnData");
+                        $callback = $routeData["callback"];
+                        
+                        if (isset($routeData["args"])) {
+                            // Call with arguments
+                            $returnData = call_user_func($callback, ...$routeData["args"]);
+                        } else {
+                            // Call without arguments.
+                            $returnData = call_user_func($callback);
+                        }
+
                         echo $returnData;
                         return;
                     }
+
+                    
                     
 
                     $controller = $routeData["controller"];
@@ -157,8 +165,8 @@ class Router
                     }
 
                     if ($returnData) {
-                        header("api-response: $returnData");
                         echo $returnData;
+                        error_log('HERE: ' + $returnData);
                     }
                     
                     

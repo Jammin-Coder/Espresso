@@ -116,11 +116,17 @@ class User
             [
                 "username" => $username,
                 "email" => $email,
-                "hashed_password" => password_hash($password, PASSWORD_BCRYPT),
+                "hashed_password" => password_hash($password, PASSWORD_BCRYPT, ["rounds" => 10]),
                 "uuid" => self::genUID()
             ]
         );
 
         echo "<p>User created</p>";
+    }
+
+    public static function isAuthenticated() {
+        /** Checks to see if user is authenticated (if authenticated session started) */
+        if (isset($_SESSION[SessionVars::USERNAME])) return true;
+        return false;
     }
 }

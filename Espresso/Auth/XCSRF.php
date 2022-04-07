@@ -19,7 +19,7 @@ class XCSRF
     public static function csrfInput()
     {
         self::setNewCSRFToken();
-        echo "<input type='hidden' name='" . self::XCSRF_TOKEN . "' value='" . $_SESSION[self::XCSRF_TOKEN] . "'>";
+        return "<input type='hidden' name='" . self::XCSRF_TOKEN . "' value='" . $_SESSION[self::XCSRF_TOKEN] . "'>";
     }
 
     public static function tokenIsOK($postedToken)
