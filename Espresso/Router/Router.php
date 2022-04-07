@@ -11,6 +11,8 @@ class Router
     {   
         // This executes if the programmer is just using a plain callback function.
         if (gettype($callback) !== "array") {
+
+             // Set the callback and request method for this route.
             self::$routes[$resource] = [
                 "callback" => $callback,
                 "method" => $requestMethod
@@ -23,6 +25,7 @@ class Router
         $controller = $callback[0]; // Get the name of the controller
         $controllerMethod = $callback[1]; // Get the method of the controller the programmer wants to call
         
+        // Set the callback, controller, and request method for this route.
         self::$routes[$resource] = [
             "callback" => $controllerMethod,
             "controller" => $controller,
@@ -98,6 +101,7 @@ class Router
          * 
         */
 
+        // Don't do anything if the request method is POST!
         if ($_SERVER["REQUEST_METHOD"] !== "POST") return;
         
         self::handleCallbacks($resource, "POST", $callback);
@@ -132,46 +136,48 @@ class Router
             if ($route == $_SERVER['PATH_INFO']) {
                 if (isset($routeData["callback"])) {
                     
-                    // Execute a regular callback
+                    // This code executes if there is a plain function set as the route callback
                     if (!isset($routeData["controller"])) {
                         $callback = $routeData["callback"];
                         
                         if (isset($routeData["args"])) {
-                            // Call with arguments
+                            // Execute callback with arguments
                             $returnData = call_user_func($callback, ...$routeData["args"]);
+
                         } else {
-                            // Call without arguments.
+
+                            // Execute callback without arguments.
                             $returnData = call_user_func($callback);
                         }
-
-                        echo $returnData;
+                        
+                        // Send data back in response
+                        if ($returnData) echo $returnData;
+                        
+                        // Stop processing route.
                         return;
                     }
 
                     
-                    
-
+                    // This code executes if there is a controller used for the route callback.
                     $controller = $routeData["controller"];
                     $method = $routeData["callback"];
                     error_log('Controller method: ' . $method);
                     
                     // Execute a controller method
                     if ($routeData["args"]) {
-                        // Call with arguments
+                        // Execute controller callback with arguments
                         $returnData = call_user_func(array($controller, $method), ...$routeData["args"]);
                     } else {
-                        // Call without arguments.
+                        // Execute controller callback without arguments.
                         $returnData = call_user_func(array($controller, $method));
                     }
-
-                    if ($returnData) {
-                        echo $returnData;
-                        error_log('HERE: ' + $returnData);
-                    }
                     
-                    
+                    // Send data back in response
+                    if ($returnData) echo $returnData;
 
                 }
+
+                // Stop processing route.
                 return;
             }
         }
