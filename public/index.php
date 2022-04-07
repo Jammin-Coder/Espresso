@@ -9,6 +9,8 @@ use Espresso\Router\Router;
 use Espresso\View\View;
 use Espresso\Database\DB;
 
+use Espresso\Controllers\TestController;
+
 View::$viewsDir = '../views';
 
 
@@ -26,12 +28,17 @@ View::$viewsDir = '../views';
  */
 
 
-DB::connect('/path/to/DBFile.php');
+DB::connect('/home/tim/DBFiles/database.php');
 
 
-Router::get('', function () {
-    echo '<h1>It works!</h1>';
+Router::get('', [TestController::class, 'index']);
+
+// Router::get('/api', [TestController::class, 'api']);
+Router::get('/api', function () {
+    return 'API RESPONSE FROM FUNCTION';
 });
+
+Router::post('/post-api', [TestController::class, 'postAPI']);
 
 
 Router::route();
