@@ -1,15 +1,15 @@
 <?php
 
-require_once __DIR__ . '/../Espresso/ini.php';
+require_once __DIR__ . '/../Phox/ini.php';
 require_once __DIR__ . '/../autoload.php';
 
 
 
-use Espresso\Router\Router;
-use Espresso\View\View;
-use Espresso\Database\DB;
+use Phox\Router\Router;
+use Phox\View\View;
+use Phox\Database\DB;
 
-use Espresso\Controllers\TestController;
+use Phox\Controllers\TestController;
 
 View::$viewsDir = '../views';
 
