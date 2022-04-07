@@ -8,7 +8,16 @@ class DB
     public static $conn;
     public static function connect($dbConfigFile)
     {
-        require $dbConfigFile;
+
+        /** Load variables from DB config file
+         * $dbType
+         * $dbHost
+         * $dbName
+         * $dbUsername
+         * $dbPassword
+         * $pdoOptions
+         */
+        require $dbConfigFile; 
 
         try {
             self::$conn = new \PDO("$dbType:host=$dbHost;dbname=$dbName", 
