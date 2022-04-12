@@ -2,12 +2,11 @@
 
 
 namespace Phox\Controllers;
-use Phox\Database\DB;
 use Phox\View\View;
 
 class TestController {
     public static function index() {
-        return View::render('home.php');
+        return View::render('home.php', ['test_var' => 'VALUE', 'other_var' => 1]);
     }
 
     public static function api() {
@@ -15,9 +14,6 @@ class TestController {
     }
 
     public static function postAPI() {
-        error_log('POST API HIT');
-        error_log(file_get_contents('php://input'));
-
         return 'POST API RESPONSE';
     }
 };

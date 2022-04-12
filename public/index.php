@@ -35,7 +35,7 @@ Router::get('', [TestController::class, 'index']);
 
 // Router::get('/api', [TestController::class, 'api']);
 Router::get('/api', function () {
-    return 'API RESPONSE FROM FUNCTION';
+    return 'GET API is working!';
 });
 
 Router::post('/post-api', [TestController::class, 'postAPI']);

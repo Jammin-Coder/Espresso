@@ -5,8 +5,24 @@ namespace Phox\View;
 class View
 {
     public static $viewsDir = "views";
-    public static function render($viewPath)
+    public static function render($viewPath, $vars = null)
     {
+        // Set any variables from the $vars array, and store them in $GLOBALS
+        // to be accessed by the view
+        if ($vars) {
+            foreach($vars as $varname => $value) {
+                $GLOBALS[$varname] = $value;
+            }
+        }
+        
+        // Include the selected view
         include self::$viewsDir . "/$viewPath";
+        
+        // Destroy any set global variables after they were used.
+        if ($vars) {
+            foreach($vars as $varname => $value) {
+                unset($GLOBALS[$varname]);
+            }
+        }
     }
 }
