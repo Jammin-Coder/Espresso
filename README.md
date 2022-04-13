@@ -5,8 +5,15 @@ that are a little to big to not use a framework,  but too small to use something
 ### Models not supported yet, just controllers and views.
 
 ## Basic overview
+`public/index.php` is the entery point for the framework. All requests are sent here.  
+Routes are registered `public/index.php`, the router takes care of assigning different actions for each route.  
+Controllers are placed in `Phox/Controllers/`.   
+Models are places in `Phox/Models` (Not implemented yet).  
+Views are stored in `views/`. Views are rendered with a template engine yet, just pure PHP.  
+Data can be 'passed' into views and accessed using `$GLOBALS['var_name']`, where `var_name` is the name of the variable that was 'passed' into the view.
+You may use `DB::query()` to make secure queries to the DB after you call `DB::connect()`
 
-#### Register routes in `index.php`:
+### Register routes in `index.php`:
 ```php
 <?php
 
@@ -28,7 +35,7 @@ Router::post('/post-name', function () {
 });
 ```
 
-#### Use the `View::render()` function to load views:
+### Use the `View::render()` function to load views:
 
 ```php
 // public/index.php
@@ -47,7 +54,7 @@ Router::get('', function () {
 <h1>Welcome to the home page!</h1>
 ```
 
-#### Use URI segments to pass in parameters (EXPERIMENTAL)
+### Use URI segments to pass in parameters (EXPERIMENTAL)
 ```php
 // public/index.php
 
@@ -62,7 +69,7 @@ Router::get('/article/{id}', function ($id) {
 
 ```
 
-#### Use controllers instead of closures in routes:
+### Use controllers instead of closures in routes:
 ```php
 // Phox/Controllers/HomeController.php
 <?php
@@ -91,7 +98,7 @@ Router::get('/home', [HomeController::class, 'home']);
 Router::get('/funny', [HomeController::class, 'displayFunnyMessage']);
 ```
 
-#### Pass in data to views:
+### Pass in data to views (EXPERIMENTAL):
 ```php
 <?php
 
@@ -105,7 +112,7 @@ class ExampleController {
 
 ```
 
-Then you can access the variables from the view with the `$GLOBALS` array (EXPERIMENTAL):
+Then you can access the variables from the view with the `$GLOBALS` array:
 ```php
 
 Hello, I'm <?php echo $GLOBALS['name'] ?>, my height is <?php $GLOBALS['height'] ?>.
@@ -113,7 +120,7 @@ Hello, I'm <?php echo $GLOBALS['name'] ?>, my height is <?php $GLOBALS['height']
 The `$GLOBALS` variables that were set when calling `View::render()` are unset after the view is loaded.
 
 
-#### Use the DB class to make queries to the database securly.
+### Use the DB class to make queries to the database securly.
 ```php
 <?php
 // index.php
