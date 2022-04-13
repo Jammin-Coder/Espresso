@@ -33,6 +33,14 @@ DB::connect('/home/tim/DBFiles/database.php');
 
 Router::get('', [TestController::class, 'index']);
 
+Router::get('/params/{param}', function ($param) {
+    return 'Is this working?';
+});
+
+Router::get('/params/test', function () {
+    return 'TEST';
+});
+
 // Router::get('/api', [TestController::class, 'api']);
 Router::get('/api', function () {
     return 'GET API is working!';

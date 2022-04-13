@@ -2,12 +2,13 @@
 
 namespace Phox\Router;
 use Phox\Auth\XCSRF;
+use Phox\Router\UrlParser;
 
 class Router
 {
     public static array $routes;
 
-    private static function handleCallbacks($resource, $requestMethod, $callback)
+    private static function handleCallbacks(string $resource, string $requestMethod, $callback)
     {   
         // This executes if the programmer is just using a plain callback function.
         if (gettype($callback) !== "array") {
@@ -40,7 +41,8 @@ class Router
         }
     }
 
-    public static function get($resource, $callback)
+    
+    public static function get(string $resource, $callback)
     {
         /**
          * Register a post route
@@ -74,7 +76,7 @@ class Router
         
     }
 
-    public static function post($resource, $callback)
+    public static function post(string $resource, $callback)
     {   
         /**
          * Register a post route
@@ -116,6 +118,68 @@ class Router
         }
     }
 
+    public static function executeCallback($routeData) {
+        $callback = $routeData["callback"];
+                    
+        if (isset($routeData["args"])) {
+            // Execute callback with arguments
+            $returnData = call_user_func($callback, ...$routeData["args"]);
+
+        } else {
+
+            // Execute callback without arguments.
+            $returnData = call_user_func($callback);
+        }
+        
+        // Send data back in response
+        if ($returnData) echo $returnData;
+    }
+
+    public static function executeControllerCallback($routeData) {
+        // This code executes if there is a controller used for the route callback.
+        $controller = $routeData["controller"];
+        $method = $routeData["callback"];
+        error_log('Controller method: ' . $method);
+        
+        // Execute a controller method
+        if (isset($routeData["args"])) {
+            // Execute controller callback with arguments
+            $returnData = call_user_func(array($controller, $method), ...$routeData["args"]);
+        } else {
+            // Execute controller callback without arguments.
+            $returnData = call_user_func(array($controller, $method));
+        }
+        
+        // Send data back in response
+        if ($returnData) echo $returnData;
+    }
+
+    public static function processRoute($route, $routeData) {
+        // If the route matches, execute the callback.
+        if ($route == $_SERVER['PATH_INFO']) {
+            error_log($route);
+            if (isset($routeData["callback"])) {
+                
+                // This code executes if there is a plain function set as the route callback
+                if (!isset($routeData["controller"])) {
+                    
+                    self::executeCallback($routeData);
+                    // Stop processing route.
+                    return true;
+                }
+
+            }
+
+            self::executeControllerCallback($routeData);
+
+            // Stop processing route.
+            return true;
+        }
+
+        // Resource was not found
+        return false;
+    }
+
     public static function route()
     {
         /**
@@ -129,57 +193,13 @@ class Router
          */
 
         // Iterate through the registered list of routes.
-        foreach (self::$routes as $route => $routeData) {
-            error_log($route);
-            
-            // If the route matches, execute the callback.
-            if ($route == $_SERVER['PATH_INFO']) {
-                if (isset($routeData["callback"])) {
-                    
-                    // This code executes if there is a plain function set as the route callback
-                    if (!isset($routeData["controller"])) {
-                        $callback = $routeData["callback"];
-                        
-                        if (isset($routeData["args"])) {
-                            // Execute callback with arguments
-                            $returnData = call_user_func($callback, ...$routeData["args"]);
+        foreach (self::$routes as $route => $routeData) {            
+            $resourceFound = self::processRoute($route, $routeData);
 
-                        } else {
+            // Resource was found, stop processing
+            if ($resourceFound) return;
 
-                            // Execute callback without arguments.
-                            $returnData = call_user_func($callback);
-                        }
-                        
-                        // Send data back in response
-                        if ($returnData) echo $returnData;
-                        
-                        // Stop processing route.
-                        return;
-                    }
-
-                    
-                    // This code executes if there is a controller used for the route callback.
-                    $controller = $routeData["controller"];
-                    $method = $routeData["callback"];
-                    error_log('Controller method: ' . $method);
-                    
-                    // Execute a controller method
-                    if ($routeData["args"]) {
-                        // Execute controller callback with arguments
-                        $returnData = call_user_func(array($controller, $method), ...$routeData["args"]);
-                    } else {
-                        // Execute controller callback without arguments.
-                        $returnData = call_user_func(array($controller, $method));
-                    }
-                    
-                    // Send data back in response
-                    if ($returnData) echo $returnData;
-
-                }
-
-                // Stop processing route.
-                return;
-            }
+            // Otherwise display page not found.
         }
 
         // This can only be reached if none of the routes matched the path.
