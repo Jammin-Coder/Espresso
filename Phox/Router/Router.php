@@ -7,17 +7,26 @@ use Phox\Router\UrlParser;
 class Router
 {
     public static array $routes;
+    public static array $paramRoutes;
 
     private static function handleCallbacks(string $resource, string $requestMethod, $callback)
     {   
         // This executes if the programmer is just using a plain callback function.
-        if (gettype($callback) !== "array") {
+        if (gettype($callback) !== 'array') {
 
-             // Set the callback and request method for this route.
-            self::$routes[$resource] = [
-                "callback" => $callback,
-                "method" => $requestMethod
-            ];
+            // Set the callback and request method for this route.
+            if (self::routeAcceptsParams($resource)) {
+                self::$paramRoutes[$resource] = [
+                    'callback' => $callback,
+                    'method' => $requestMethod
+                ];
+            } else {
+                self::$routes[$resource] = [
+                    'callback' => $callback,
+                    'method' => $requestMethod
+                ];
+            }
+            
             return;
         }
         
@@ -27,20 +36,48 @@ class Router
         $controllerMethod = $callback[1]; // Get the method of the controller the programmer wants to call
         
         // Set the callback, controller, and request method for this route.
-        self::$routes[$resource] = [
-            "callback" => $controllerMethod,
-            "controller" => $controller,
-            "method" => $requestMethod
-        ];
+        if (self::routeAcceptsParams($resource)) {
+            self::$paramRoutes[$resource] = [
+                'callback' => $controllerMethod,
+                'controller' => $controller,
+                'method' => $requestMethod
+            ];
+        } else {
+            self::$routes[$resource] = [
+                'callback' => $controllerMethod,
+                'controller' => $controller,
+                'method' => $requestMethod
+            ];
+        }
 
         // If the length of the $callback array is more than 2, then the programmer is supplying
         // arguments to be passed into the method.
         // Extract the arguments and add them to self::$routes[$resource]["args"].
         if (count($callback) > 2) {
-            self::$routes[$resource]["args"] = array_slice($callback, 2);
+            self::$routes[$resource]['args'] = array_slice($callback, 2);
         }
     }
 
+    public static function routeAcceptsParams($route) {
+        /**
+         * If route has segments wrapped in braces, then this route will be marked
+         * as a route that accepts parameters in self::paramRoutes;
+         */
+
+        $explodedRoutePath = explode('/', $route);
+        
+        foreach($explodedRoutePath as $seg) {
+            if (
+                str_split($seg)[0] == '{' &&
+                end(str_split($seg)) == '}'
+            ) {
+                return true;
+            }
+
+        }
+
+        return false;
+    }
     
     public static function get(string $resource, $callback)
     {
@@ -121,9 +158,9 @@ class Router
     public static function executeCallback($routeData) {
         $callback = $routeData["callback"];
                     
-        if (isset($routeData["args"])) {
+        if (isset($routeData['args'])) {
             // Execute callback with arguments
-            $returnData = call_user_func($callback, ...$routeData["args"]);
+            $returnData = call_user_func($callback, ...$routeData['args']);
 
         } else {
 
@@ -154,10 +191,9 @@ class Router
         if ($returnData) echo $returnData;
     }
 
-    public static function processRoute($route, $routeData) {
+    public static function processRoute($route, $routeData, $requestedUri) {
         // If the route matches, execute the callback.
-        if ($route == $_SERVER['PATH_INFO']) {
-            error_log($route);
+        if ($route == $requestedUri) {
             if (isset($routeData["callback"])) {
                 
                 // This code executes if there is a plain function set as the route callback
@@ -193,13 +229,47 @@ class Router
          */
 
         // Iterate through the registered list of routes.
-        foreach (self::$routes as $route => $routeData) {            
-            $resourceFound = self::processRoute($route, $routeData);
+        foreach (self::$routes as $route => $routeData) {
+            $requestedUri = $_SERVER['PATH_INFO'];
+            $resourceFound = self::processRoute($route, $routeData, $requestedUri);
 
             // Resource was found, stop processing
             if ($resourceFound) return;
 
-            // Otherwise display page not found.
+        }
+
+        // Try parameter routes
+        foreach (self::$paramRoutes as $route => $routeData) {
+            if (UrlParser::uriSimilarToRoute($route, $requestedUri)) {
+                // echo 'Route is similar to URI. <br>';
+                // echo "Route: $route <br>";
+                // echo "URI: $requestedUri <br>";
+                $routeData['args'] = array();
+                $params = UrlParser::getParamsFromUri($requestedUri, $route);
+
+                foreach ($params as $paramNum => $paramValue) {
+                    array_push($routeData['args'], $paramValue);
+                }
+                
+                if (isset($routeData["callback"])) {
+                
+                    // This code executes if there is a plain function set as the route callback
+                    if (!isset($routeData["controller"])) {
+                        
+                        self::executeCallback($routeData);
+                        // Stop processing route.
+                        return true;
+                    }
+    
+                }
+    
+                self::executeControllerCallback($routeData);
+    
+                // Stop processing route.
+                return;
+
+            }
+            // print_r(UrlParser::getUriParamPattern($requestedUri));
         }
 
         // This can only be reached if none of the routes matched the path.

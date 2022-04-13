@@ -34,19 +34,16 @@ DB::connect('/home/tim/DBFiles/database.php');
 Router::get('', [TestController::class, 'index']);
 
 Router::get('/params/{param}', function ($param) {
-    return 'Is this working?';
+    return "Here is the parameter: $param";
+});
+
+Router::get('/params/{param}/a/{param2}', function ($param, $param2) {
+    return "Here is the parameter: $param <br> Here is another one: $param2";
 });
 
 Router::get('/params/test', function () {
-    return 'TEST';
+    return 'This is just a test';
 });
-
-// Router::get('/api', [TestController::class, 'api']);
-Router::get('/api', function () {
-    return 'GET API is working!';
-});
-
-Router::post('/post-api', [TestController::class, 'postAPI']);
 
 
 Router::route();
