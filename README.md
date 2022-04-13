@@ -147,6 +147,7 @@ DB::connect($DBFilePath);
 Once DB::connect is called, you can make queries from any file just by inlcuding the DB class:
 ```php
 namespace Phox\Controllers;
+use Phox\Database\DB;
 
 class ExampleController {
   public static funciton databaseDemo () {
