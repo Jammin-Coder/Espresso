@@ -4,7 +4,9 @@ namespace Phox\View;
 
 class View
 {
-    public static $viewsDir = "views";
+    // Assuming the index.php file is hosted in `public/`, 
+    // then the views folder would be in public/../views
+    public static $viewsDir = "../views";
     public static function render($viewPath, $vars = null)
     {
         // Set any variables from the $vars array, and store them in $GLOBALS

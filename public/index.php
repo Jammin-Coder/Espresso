@@ -6,13 +6,7 @@ require_once __DIR__ . '/../autoload.php';
 
 
 use Phox\Router\Router;
-use Phox\View\View;
 use Phox\Database\DB;
-
-use Phox\Controllers\TestController;
-
-View::$viewsDir = '../views';
-
 
 // Database
 /**
@@ -28,21 +22,11 @@ View::$viewsDir = '../views';
  */
 
 
-DB::connect('/home/tim/DBFiles/database.php');
+// DB::connect('/home/tim/DBFiles/database.php');
 
 
-Router::get('', [TestController::class, 'index']);
-
-Router::get('/params/{param}', function ($param) {
-    return "Here is the parameter: $param";
-});
-
-Router::get('/params/{param}/a/{param2}', function ($param, $param2) {
-    return "Here is the parameter: $param <br> Here is another one: $param2";
-});
-
-Router::get('/params/test', function () {
-    return 'This is just a test';
+Router::get('', function () {
+    return 'Welcome to Phox!';
 });
 
 

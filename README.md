@@ -41,7 +41,6 @@ Router::post('/post-name', function () {
 // public/index.php
 
 use Phox\View\View;
-View::$viewsDir = '../views/';
 
 Router::get('', function () {
   View::render('home.php'); // load views/home.php
