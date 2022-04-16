@@ -2,3 +2,4 @@
 views/*.php
 public/*.php
 Phox/Controllers/TestController.php
+/vendor/
