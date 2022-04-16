@@ -1,0 +1,18 @@
+{
+    "name": "jammincoder/phox",
+    "description": "A lightweight, intuitive MVC webframework based off of Laravel.",
+    "type": "library",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Phox\\": "phox/"
+        }
+    },
+    "authors": [
+        {
+            "name": "jammincoder",
+            "email": "jammincoderguy96@gmail.com"
+        }
+    ],
+    "require": {}
+}
