@@ -17,8 +17,9 @@ You may use `DB::query()` to make secure queries to the DB after you call `DB::c
 ```php
 <?php
 
-require_once __DIR__ . '/../Phox/ini.php';
-require_once __DIR__ . '/../autoload.php';
+require_once __DIR__ . '/../config/ini.php';
+require_once __DIR__ . '/../vendor/autoload.php';
+
 
 use Phox\Router\Router;
 
