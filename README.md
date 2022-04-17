@@ -57,14 +57,11 @@ Router::get('', function () {
 ```php
 <?php
 
-namespace Phox\Controllers;
 use Phox\View\View;
 
-class ExampleController {
-  public static function home () {
+Router::get('/home', function () {
     return View::render('home.php', ['name' => 'john', 'height' => '5`6']);
-  }
-};
+});
 
 ```
 
