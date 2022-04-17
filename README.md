@@ -9,8 +9,8 @@ that are a little to big to not use a framework,  but too small to use something
 Routes are registered `public/index.php`, the router takes care of assigning different actions for each route.  
 Controllers are placed in `Phox/Controllers/`.   
 Models are places in `Phox/Models` (Not implemented yet).  
-Views are stored in `views/`. Views are rendered with a template engine yet, just pure PHP.  
-Data can be 'passed' into views and accessed using `$GLOBALS['var_name']`, where `var_name` is the name of the variable that was 'passed' into the view.
+Views are stored in `views/` and are rendered with the [Twig template engine.](https://twig.symfony.com/doc/3.x/)   
+
 You may use `DB::query()` to make secure queries to the DB after you call `DB::connect()`
 
 ### Register routes in `index.php`:
@@ -52,6 +52,27 @@ Router::get('', function () {
 
 <h1>Welcome to the home page!</h1>
 ```
+
+### Pass in data to Twig views:
+```php
+<?php
+
+use Phox\View\View;
+
+Router::get('/home', function () {
+    return View::render('home.php', ['name' => 'john', 'height' => '5`6']);
+});
+
+```
+
+Then you can access the variables from the Twig template:
+```
+
+Hello, I'm {{ name }}, my height is {{ height }}.
+```
+
+#### Read more about the [Twig template engine](https://twig.symfony.com/doc/3.x/)
+
 
 ### Use URI segments to pass in parameters (EXPERIMENTAL)
 ```php
@@ -97,26 +118,6 @@ Router::get('/home', [HomeController::class, 'home']);
 Router::get('/funny', [HomeController::class, 'displayFunnyMessage']);
 ```
 
-### Pass in data to views (EXPERIMENTAL):
-```php
-<?php
-
-namespace Phox\Controllers;
-
-class ExampleController {
-  public static function home () {
-    return View::render('home.php', ['name' => 'john', 'height' => '5`6']);
-  }
-};
-
-```
-
-Then you can access the variables from the view with the `$GLOBALS` array:
-```php
-
-Hello, I'm <?php echo $GLOBALS['name'] ?>, my height is <?php $GLOBALS['height'] ?>.
-```
-The `$GLOBALS` variables that were set when calling `View::render()` are unset after the view is loaded.
 
 
 ### Use the DB class to make queries to the database securly.
