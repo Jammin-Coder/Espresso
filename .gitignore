@@ -2,3 +2,4 @@
 views/*.php
 Phox/Controllers/TestController.php
 /vendor/
+/twig_cache
