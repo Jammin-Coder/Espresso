@@ -228,9 +228,10 @@ class Router
          * 
          */
 
+        $requestedUri = $_SERVER['PATH_INFO'];
+        
         // Iterate through the registered list of routes.
         foreach (self::$routes as $route => $routeData) {
-            $requestedUri = $_SERVER['PATH_INFO'];
             $resourceFound = self::processRoute($route, $routeData, $requestedUri);
 
             // Resource was found, stop processing
