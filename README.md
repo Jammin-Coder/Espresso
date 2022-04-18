@@ -2,7 +2,7 @@
 A lightweight, powerful, minimalistic, easy to understand MVC framework for PHP.
 This framework is very similar to Laravel, but much more lightweight, and meant for apps 
 that are a little to big to not use a framework,  but too small to use something like Laravel.
-### Models not supported yet, just controllers and views.
+#### Models are still experimental. They can only save data at the moment.
 
 ## Basic overview
 `public/index.php` is the entery point for the framework. All requests are sent here.  
@@ -119,6 +119,44 @@ Router::get('/home', [HomeController::class, 'home']);
 Router::get('/funny', [HomeController::class, 'displayFunnyMessage']);
 ```
 
+### Breif overview of Models (EXPERIMENTAL)
+```php
+<?php
+
+// File: `phox/Models/User.php`
+
+namespace Phox\Models;
+use Phox\Models\Model;
+
+class User extends Model {
+	public $table = 'users'; // Name of DB table to use.
+
+	// All of the columns that are to be filled with this Model
+	// must be listed here.
+	public array $fillable [
+		'username',
+		'password,
+		'uuid'
+	];
+};
+```
+
+Then you can create a new instance of a the Model, assign it data, and save it:
+
+```php
+<?php
+use Phox\Models\User;
+
+// Create a new user and store their info in the DB
+$user = new User([
+	'username' => $_POST['username'],
+	'password' => password_hash($_POST['password'], PASSWORD_BCRYPT),
+	'uuid' => bin2hex(random_bytes(32));
+]);
+
+$user->save(); // Save the user
+
+```
 
 
 ### Use the DB class to make queries to the database securly.
